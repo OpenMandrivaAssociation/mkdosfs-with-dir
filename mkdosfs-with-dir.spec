@@ -1,6 +1,6 @@
 %define name mkdosfs-with-dir
 %define version 1.0
-%define release %mkrel 4
+%define release %mkrel 5
 
 Summary: Create a DOS image from a directory
 Name: %{name}
