@@ -1,0 +1,34 @@
+#!/usr/bin/perl -T
+
+use File::Temp;
+
+@ARGV == 2 or die "usage: mkdosfs-with-dir <dir> <dosfs image>\n";
+
+my ($dir, $img) = map {
+    m![^\w.+:/-]! and die "bad path $_\n";
+    /(.*)/;
+} @ARGV;
+
+($<, $>) = ($>, $<);
+
+-e $img or die "$img does not exist\n";
+-w $img or die "you don't have the rights to write into $img\n";
+-d $dir or die "$dir must be a directory\n";
+
+%ENV = (PATH => '/bin:/sbin:/usr/bin:/usr/sbin');
+
+sub __ { print @_, "\n"; system(@_) == 0 }
+
+my $tmp_mnt = File::Temp::tempdir('/tmp/mkdosfs-with-dir-XXXX', CLEANUP => 1);
+__ "mkdosfs $img" or die "mkdosfs failed\n";
+
+
+$> = $<;
+
+if (__ "mount -t vfat -o umask=0,loop $img $tmp_mnt") {
+    my $err;
+    __ "tar cC $dir --owner=root . | tar xC $tmp_mnt" or $err = "copying failed";
+    __ "umount $tmp_mnt" or $err ||= "umount failed";
+    !$err or die "$err\n";
+}
+print "succeded\n";
