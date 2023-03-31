@@ -1,7 +1,7 @@
 Summary:	Create a DOS image from a directory
 Name:		mkdosfs-with-dir
 Version:	1.0
-Release:	19
+Release:	20
 License:	GPLv2
 Group:		File tools
 Source0:	%{name}
